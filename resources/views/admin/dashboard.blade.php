@@ -1,14 +1,20 @@
 <x-admin-layout title="Dashboard">
-    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         @foreach ([
-            ['label' => 'Total Produk', 'value' => $productCount],
-            ['label' => 'Produk Aktif', 'value' => $activeProductCount],
-            ['label' => 'Kategori', 'value' => $categoryCount],
-            ['label' => 'Lokasi Aktif', 'value' => $warehouseCount],
+            ['label' => 'Total Produk', 'value' => number_format($productCount, 0, ',', '.')],
+            ['label' => 'Produk Aktif', 'value' => number_format($activeProductCount, 0, ',', '.')],
+            ['label' => 'Kategori', 'value' => number_format($categoryCount, 0, ',', '.')],
+            ['label' => 'Lokasi Aktif', 'value' => number_format($warehouseCount, 0, ',', '.')],
+            ['label' => 'Stok Menipis', 'value' => number_format($lowStockCount, 0, ',', '.').' SKU', 'href' => route('admin.inventory.index', ['low' => 1])],
+            ['label' => 'Nilai Stok '.($defaultWarehouse?->name ?? ''), 'value' => rupiah($stockValue), 'href' => route('admin.inventory.index')],
         ] as $card)
             <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
                 <p class="text-sm text-gray-500">{{ $card['label'] }}</p>
-                <p class="mt-2 text-3xl font-semibold text-gray-900">{{ number_format($card['value'], 0, ',', '.') }}</p>
+                @if (! empty($card['href']))
+                    <a href="{{ $card['href'] }}" class="mt-2 block text-2xl font-semibold text-gray-900 hover:text-indigo-600">{{ $card['value'] }}</a>
+                @else
+                    <p class="mt-2 text-2xl font-semibold text-gray-900">{{ $card['value'] }}</p>
+                @endif
             </div>
         @endforeach
     </div>

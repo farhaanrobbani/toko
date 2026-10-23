@@ -6,6 +6,12 @@
         ['label' => 'Produk', 'route' => 'admin.products.index', 'pattern' => 'admin.products.*'],
         ['label' => 'Kategori', 'route' => 'admin.categories.index', 'pattern' => 'admin.categories.*'],
         ['label' => 'Lokasi Stok', 'route' => 'admin.warehouses.index', 'pattern' => 'admin.warehouses.*'],
+        ['label' => 'Inventori', 'route' => 'admin.inventory.index', 'pattern' => 'admin.inventory.*'],
+        ['label' => 'Pembelian', 'route' => 'admin.purchases.index', 'pattern' => 'admin.purchases.*'],
+        ['label' => 'Supplier', 'route' => 'admin.suppliers.index', 'pattern' => 'admin.suppliers.*'],
+        ['label' => 'Transfer Stok', 'route' => 'admin.transfers.index', 'pattern' => 'admin.transfers.*'],
+        ['label' => 'Stok Opname', 'route' => 'admin.stock-counts.index', 'pattern' => 'admin.stock-counts.*'],
+        ['label' => 'Penyesuaian', 'route' => 'admin.adjustments.create', 'pattern' => 'admin.adjustments.*'],
         ['label' => 'Pengaturan', 'route' => 'admin.settings.edit', 'pattern' => 'admin.settings.*'],
         ['label' => 'POS', 'route' => 'pos.index', 'pattern' => 'pos.*'],
     ];
@@ -41,7 +47,7 @@
                     <span class="rounded bg-indigo-600 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">Admin</span>
                 </div>
 
-                <nav class="space-y-1 px-3 py-4">
+                <nav class="max-h-[calc(100vh-4rem)] space-y-1 overflow-y-auto px-3 py-4">
                     @foreach ($navigation as $item)
                         <a
                             href="{{ route($item['route']) }}"
