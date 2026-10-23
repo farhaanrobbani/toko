@@ -1,0 +1,24 @@
+[program:toko-reverb]
+command=php /var/www/toko/artisan reverb:start --host=127.0.0.1 --port=8080
+directory=/var/www/toko
+autostart=true
+autorestart=true
+user=www-data
+redirect_stderr=true
+stdout_logfile=/var/log/supervisor/toko-reverb.log
+stopasgroup=true
+killasgroup=true
+numprocs=1
+
+[program:toko-queue]
+command=php /var/www/toko/artisan queue:work --sleep=1 --tries=3 --timeout=90
+directory=/var/www/toko
+autostart=true
+autorestart=true
+user=www-data
+redirect_stderr=true
+stdout_logfile=/var/log/supervisor/toko-queue.log
+stopasgroup=true
+killasgroup=true
+stopwaitsecs=3600
+numprocs=1
