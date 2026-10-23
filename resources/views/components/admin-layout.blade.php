@@ -3,6 +3,7 @@
 @php
     $navigation = [
         ['label' => 'Dashboard', 'route' => 'admin.dashboard', 'pattern' => 'admin.dashboard'],
+        ['label' => 'Pesanan Online', 'route' => 'admin.orders.index', 'pattern' => 'admin.orders.*'],
         ['label' => 'Produk', 'route' => 'admin.products.index', 'pattern' => 'admin.products.*'],
         ['label' => 'Kategori', 'route' => 'admin.categories.index', 'pattern' => 'admin.categories.*'],
         ['label' => 'Lokasi Stok', 'route' => 'admin.warehouses.index', 'pattern' => 'admin.warehouses.*'],

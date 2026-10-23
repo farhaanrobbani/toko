@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\OrderStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\Order;
 use App\Models\Product;
 use App\Models\StockLevel;
 use App\Models\Warehouse;
@@ -43,6 +45,7 @@ class DashboardController extends Controller
             'warehouseCount' => Warehouse::query()->active()->count(),
             'lowStockCount' => $lowStockCount,
             'stockValue' => $stockValue,
+            'pendingOrderCount' => Order::query()->where('status', OrderStatus::PendingPayment)->count(),
             'defaultWarehouse' => $defaultWarehouse,
             'recentProducts' => Product::query()->latest()->limit(5)->get(),
         ]);

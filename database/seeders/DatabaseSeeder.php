@@ -110,6 +110,7 @@ class DatabaseSeeder extends Seeder
             'default_min_stock' => 5,
             'online_warehouse_id' => $warehouse->id,
             'order_expiry_hours' => 24,
+            'qris_note' => 'Setelah melakukan pembayaran QRIS, unggah bukti pembayaran pada halaman pesanan Anda.',
         ];
 
         foreach ($settings as $key => $value) {

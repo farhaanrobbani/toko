@@ -32,6 +32,9 @@ class SettingRequest extends FormRequest
             'default_min_stock' => ['required', 'integer', 'min:0'],
             'online_warehouse_id' => ['nullable', 'integer', 'exists:warehouses,id'],
             'order_expiry_hours' => ['required', 'integer', 'min:1', 'max:720'],
+            'qris_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'qris_note' => ['nullable', 'string', 'max:500'],
+            'remove_qris_image' => ['nullable', 'boolean'],
         ];
     }
 }

@@ -7,6 +7,7 @@
             ['label' => 'Lokasi Aktif', 'value' => number_format($warehouseCount, 0, ',', '.')],
             ['label' => 'Stok Menipis', 'value' => number_format($lowStockCount, 0, ',', '.').' SKU', 'href' => route('admin.inventory.index', ['low' => 1])],
             ['label' => 'Nilai Stok '.($defaultWarehouse?->name ?? ''), 'value' => rupiah($stockValue), 'href' => route('admin.inventory.index')],
+            ['label' => 'Pesanan Menunggu', 'value' => number_format($pendingOrderCount, 0, ',', '.'), 'href' => route('admin.orders.index', ['status' => \App\Enums\OrderStatus::PendingPayment->value])],
         ] as $card)
             <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
                 <p class="text-sm text-gray-500">{{ $card['label'] }}</p>

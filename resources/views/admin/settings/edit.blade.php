@@ -1,5 +1,5 @@
 <x-admin-layout title="Pengaturan">
-    <form method="POST" action="{{ route('admin.settings.update') }}" class="max-w-4xl space-y-6">
+    <form method="POST" action="{{ route('admin.settings.update') }}" enctype="multipart/form-data" class="max-w-4xl space-y-6">
         @csrf
         @method('PUT')
 
@@ -82,6 +82,35 @@
                     <x-text-input id="order_expiry_hours" name="order_expiry_hours" type="number" min="1" max="720" class="mt-1 block w-full" :value="old('order_expiry_hours', $settings['order_expiry_hours'])" required />
                     <p class="mt-1 text-xs text-gray-500">Pesanan yang belum diproses akan dibatalkan otomatis setelah durasi ini.</p>
                     <x-input-error :messages="$errors->get('order_expiry_hours')" class="mt-2" />
+                </div>
+            </div>
+        </div>
+
+        <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+            <h2 class="mb-4 font-semibold text-gray-900">Pembayaran QRIS</h2>
+
+            <div class="grid gap-4 sm:grid-cols-2">
+                <div>
+                    <x-input-label for="qris_image" value="Gambar QRIS" />
+                    <input id="qris_image" name="qris_image" type="file" accept="image/*" class="mt-1 block w-full text-sm text-gray-600 file:mr-3 file:rounded-lg file:border-0 file:bg-indigo-50 file:px-3 file:py-2 file:text-sm file:font-medium file:text-indigo-700 hover:file:bg-indigo-100">
+                    <p class="mt-1 text-xs text-gray-500">JPG, PNG, atau WEBP maksimal 2 MB.</p>
+                    <x-input-error :messages="$errors->get('qris_image')" class="mt-2" />
+
+                    @if ($settings['qris_image_path'])
+                        <div class="mt-3">
+                            <img src="{{ asset('storage/'.$settings['qris_image_path']) }}" alt="QRIS saat ini" class="h-40 rounded-lg border border-gray-200 object-contain">
+                            <label class="mt-2 flex items-center gap-2 text-xs text-gray-600">
+                                <input type="checkbox" name="remove_qris_image" value="1" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                Hapus gambar QRIS saat ini
+                            </label>
+                        </div>
+                    @endif
+                </div>
+
+                <div>
+                    <x-input-label for="qris_note" value="Catatan Pembayaran" />
+                    <textarea id="qris_note" name="qris_note" rows="5" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="Contoh: setelah transfer, unggah bukti pembayaran di halaman pesanan.">{{ old('qris_note', $settings['qris_note']) }}</textarea>
+                    <x-input-error :messages="$errors->get('qris_note')" class="mt-2" />
                 </div>
             </div>
         </div>
