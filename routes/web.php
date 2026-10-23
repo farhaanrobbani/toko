@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\InventoryController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\PurchaseController;
+use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\StockCountController;
 use App\Http\Controllers\Admin\StockTransferController;
@@ -64,6 +65,9 @@ Route::middleware(['auth', 'role:owner'])->prefix('admin')->name('admin.')->grou
     Route::resource('categories', CategoryController::class)->except('show');
     Route::resource('products', ProductController::class)->except('show');
     Route::resource('warehouses', WarehouseController::class)->except('show');
+
+    Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('reports/export', [ReportController::class, 'export'])->name('reports.export');
 
     Route::resource('orders', OrderController::class)->only(['index', 'show']);
     Route::post('orders/{order}/confirm', [OrderController::class, 'confirm'])->name('orders.confirm');
