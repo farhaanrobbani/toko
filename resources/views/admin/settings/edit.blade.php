@@ -87,6 +87,24 @@
         </div>
 
         <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+            <h2 class="mb-4 font-semibold text-gray-900">Point of Sale</h2>
+
+            <div class="grid gap-4 sm:grid-cols-2">
+                <div>
+                    <x-input-label for="pos_warehouse_id" value="Lokasi Stok Default POS" />
+                    <select id="pos_warehouse_id" name="pos_warehouse_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                        <option value="">Otomatis (Toko/default)</option>
+                        @foreach ($warehouses as $warehouse)
+                            <option value="{{ $warehouse->id }}" @selected((string) old('pos_warehouse_id', $settings['pos_warehouse_id']) === (string) $warehouse->id)>{{ $warehouse->name }}</option>
+                        @endforeach
+                    </select>
+                    <p class="mt-1 text-xs text-gray-500">Kasir tetap bisa memilih lokasi lain saat membuka layar POS.</p>
+                    <x-input-error :messages="$errors->get('pos_warehouse_id')" class="mt-2" />
+                </div>
+            </div>
+        </div>
+
+        <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
             <h2 class="mb-4 font-semibold text-gray-900">Pembayaran QRIS</h2>
 
             <div class="grid gap-4 sm:grid-cols-2">

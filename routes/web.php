@@ -50,6 +50,12 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('/pos', [PosController::class, 'index'])->name('pos.index');
+    Route::post('/pos', [PosController::class, 'store'])->name('pos.store');
+    Route::get('/pos/sales/{sale}', [PosController::class, 'receipt'])->name('pos.receipt');
+});
+
+Route::middleware(['auth', 'role:owner'])->group(function () {
+    Route::post('/pos/sales/{sale}/void', [PosController::class, 'void'])->name('pos.void');
 });
 
 Route::middleware(['auth', 'role:owner'])->prefix('admin')->name('admin.')->group(function () {

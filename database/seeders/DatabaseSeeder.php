@@ -109,6 +109,7 @@ class DatabaseSeeder extends Seeder
             'price_rounding' => 100,
             'default_min_stock' => 5,
             'online_warehouse_id' => $warehouse->id,
+            'pos_warehouse_id' => $store->id,
             'order_expiry_hours' => 24,
             'qris_note' => 'Setelah melakukan pembayaran QRIS, unggah bukti pembayaran pada halaman pesanan Anda.',
         ];

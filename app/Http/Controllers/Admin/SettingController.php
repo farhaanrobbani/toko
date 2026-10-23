@@ -24,6 +24,7 @@ class SettingController extends Controller
                 'price_rounding' => Setting::get('price_rounding', 100),
                 'default_min_stock' => Setting::get('default_min_stock', 5),
                 'online_warehouse_id' => Setting::get('online_warehouse_id'),
+                'pos_warehouse_id' => Setting::get('pos_warehouse_id'),
                 'order_expiry_hours' => Setting::get('order_expiry_hours', 24),
                 'qris_image_path' => Setting::get('qris_image_path'),
                 'qris_note' => Setting::get('qris_note', ''),
