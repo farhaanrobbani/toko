@@ -1,3 +1,11 @@
+@php
+    $cartLines = $lines->map(fn ($line) => [
+        'product_id' => $line['product']->getKey(),
+        'quantity' => $line['quantity'],
+        'available' => $line['available'],
+    ])->values();
+@endphp
+
 <x-store-layout title="Keranjang">
     <div class="flex flex-wrap items-end justify-between gap-3">
         <div>
@@ -14,7 +22,7 @@
             <a href="{{ route('home') }}" class="mt-5 inline-block rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700">Lihat produk</a>
         </div>
     @else
-        <div class="mt-6 grid gap-6 lg:grid-cols-[1fr_340px]">
+        <div class="mt-6 grid gap-6 lg:grid-cols-[1fr_340px]" x-data="cartStock(@js($cartLines))">
             <div class="space-y-3">
                 @foreach ($lines as $line)
                     @php($product = $line['product'])
@@ -32,9 +40,11 @@
                                 <a href="{{ route('store.products.show', $product) }}" class="font-semibold text-gray-900 hover:text-indigo-700">{{ $product->name }}</a>
                                 <p class="mt-0.5 text-xs text-gray-500">{{ $product->sku }} · {{ $product->unit }}</p>
                                 <p class="mt-1 text-sm font-medium text-gray-900">{{ rupiah($product->sell_price) }}</p>
-                                @if ($line['insufficient'])
-                                    <p class="mt-1 text-xs font-medium text-red-600">Stok tersedia hanya {{ qty($line['available']) }}.</p>
-                                @endif
+                                <template x-if="insufficientFor({{ $product->getKey() }})">
+                                    <p class="mt-1 text-xs font-medium text-red-600">
+                                        Stok tersedia hanya <span x-text="fmt(availableFor({{ $product->getKey() }}))">{{ qty($line['available']) }}</span>.
+                                    </p>
+                                </template>
                             </div>
 
                             <div class="flex items-end gap-3">
@@ -43,7 +53,7 @@
                                     @method('PATCH')
                                     <div>
                                         <x-input-label for="quantity-{{ $product->id }}" value="Jumlah" class="text-xs" />
-                                        <input id="quantity-{{ $product->id }}" name="quantity" type="number" step="0.001" min="0" value="{{ qty($line['quantity']) }}" class="mt-1 w-24 rounded-lg border-gray-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                        <input id="quantity-{{ $product->id }}" name="quantity" type="number" step="0.001" min="0" :max="availableFor({{ $product->getKey() }})" value="{{ qty($line['quantity']) }}" class="mt-1 w-24 rounded-lg border-gray-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                     </div>
                                     <button type="submit" class="rounded-lg border border-gray-300 px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50">Perbarui</button>
                                 </form>
@@ -81,12 +91,16 @@
                     <span>{{ rupiah($subtotal) }}</span>
                 </div>
 
-                @if ($lines->contains('insufficient', true))
-                    <p class="mt-4 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">Perbarui jumlah produk yang stoknya tidak mencukupi sebelum checkout.</p>
-                    <span class="mt-4 block cursor-not-allowed rounded-xl bg-gray-200 px-5 py-3 text-center text-sm font-semibold text-gray-500">Lanjut ke Checkout</span>
-                @else
+                <template x-if="anyInsufficient">
+                    <div>
+                        <p class="mt-4 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">Perbarui jumlah produk yang stoknya tidak mencukupi sebelum checkout.</p>
+                        <span class="mt-4 block cursor-not-allowed rounded-xl bg-gray-200 px-5 py-3 text-center text-sm font-semibold text-gray-500">Lanjut ke Checkout</span>
+                    </div>
+                </template>
+
+                <template x-if="!anyInsufficient">
                     <a href="{{ route('checkout.create') }}" class="mt-4 block rounded-xl bg-indigo-600 px-5 py-3 text-center text-sm font-semibold text-white hover:bg-indigo-700">Lanjut ke Checkout</a>
-                @endif
+                </template>
 
                 <p class="mt-3 text-center text-xs text-gray-500">Tidak perlu membuat akun.</p>
             </aside>

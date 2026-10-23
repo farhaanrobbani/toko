@@ -2,7 +2,9 @@
 
 @php
     $storeName = \App\Models\Setting::get('store_name', 'Toko');
-    $cartCount = app(\App\Services\CartService::class)->count();
+    $cartService = app(\App\Services\CartService::class);
+    $cartCount = $cartService->count();
+    $stockWarehouse = $cartService->warehouse();
 @endphp
 
 <!DOCTYPE html>
@@ -11,6 +13,8 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
+        <meta name="stock-warehouse-id" content="{{ $stockWarehouse?->getKey() }}">
+        <meta name="stock-endpoint" content="{{ route('stock.live') }}">
         @if ($noindex)
             <meta name="robots" content="noindex, nofollow">
         @endif

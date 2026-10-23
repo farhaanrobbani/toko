@@ -1,6 +1,11 @@
 @php
     $selectedDelivery = old('delivery_method', \App\Enums\DeliveryMethod::Delivery->value);
     $selectedPayment = old('payment_method', \App\Enums\PaymentMethod::Qris->value);
+    $checkoutLines = $lines->map(fn ($line) => [
+        'product_id' => $line['product']->getKey(),
+        'quantity' => $line['quantity'],
+        'available' => $line['available'],
+    ])->values();
 @endphp
 
 <x-store-layout title="Checkout">
@@ -16,7 +21,7 @@
         method="POST"
         action="{{ route('checkout.store') }}"
         class="mt-6 grid gap-6 lg:grid-cols-[1fr_360px]"
-        x-data="{ delivery: '{{ $selectedDelivery }}' }"
+        x-data="checkoutStock('{{ $selectedDelivery }}', @js($checkoutLines))"
     >
         @csrf
 
@@ -91,6 +96,11 @@
                         <div class="min-w-0">
                             <p class="truncate font-medium text-gray-900">{{ $line['product']->name }}</p>
                             <p class="text-xs text-gray-500">{{ qty($line['quantity']) }} {{ $line['product']->unit }} × {{ rupiah($line['product']->sell_price) }}</p>
+                            <template x-if="insufficientFor({{ $line['product']->getKey() }})">
+                                <p class="mt-1 text-xs font-medium text-red-600">
+                                    Stok tersedia hanya <span x-text="fmt(availableFor({{ $line['product']->getKey() }}))">{{ qty($line['available']) }}</span>.
+                                </p>
+                            </template>
                         </div>
                         <p class="shrink-0 font-medium text-gray-900">{{ rupiah($line['subtotal']) }}</p>
                     </div>
@@ -112,7 +122,21 @@
                 </div>
             </div>
 
-            <button type="submit" class="mt-5 w-full rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white hover:bg-indigo-700">Buat Pesanan</button>
+            <template x-if="anyInsufficient">
+                <div class="mt-4 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">
+                    Stok berubah dan jumlah pesanan tidak lagi tersedia.
+                    <a href="{{ route('cart.index') }}" class="font-semibold underline">Kembali ke keranjang</a>.
+                </div>
+            </template>
+
+            <button
+                type="submit"
+                class="mt-5 w-full rounded-xl px-5 py-3 text-sm font-semibold"
+                :disabled="anyInsufficient"
+                :class="anyInsufficient ? 'cursor-not-allowed bg-gray-200 text-gray-500' : 'bg-indigo-600 text-white hover:bg-indigo-700'"
+            >
+                <span x-text="anyInsufficient ? 'Stok Berubah' : 'Buat Pesanan'">Buat Pesanan</span>
+            </button>
             <p class="mt-3 text-center text-xs text-gray-500">Stok akan direservasi setelah pesanan dibuat.</p>
         </aside>
     </form>

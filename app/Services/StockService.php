@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\StockMovementType;
+use App\Events\StockLevelUpdated;
 use App\Models\Product;
 use App\Models\StockLevel;
 use App\Models\StockMovement;
@@ -50,6 +51,8 @@ class StockService
 
             $level->update(['qty' => $newQty]);
 
+            $this->dispatchStockLevel($product, $warehouse, (float) $level->qty - (float) $level->reserved_qty);
+
             return StockMovement::query()->create([
                 'product_id' => $product->getKey(),
                 'warehouse_id' => $warehouse->getKey(),
@@ -90,6 +93,8 @@ class StockService
             $level->update([
                 'reserved_qty' => round((float) $level->reserved_qty + $quantity, 3),
             ]);
+
+            $this->dispatchStockLevel($product, $warehouse, (float) $level->qty - (float) $level->reserved_qty);
         });
     }
 
@@ -113,6 +118,8 @@ class StockService
             $level->update([
                 'reserved_qty' => max(0, round((float) $level->reserved_qty - $quantity, 3)),
             ]);
+
+            $this->dispatchStockLevel($product, $warehouse, (float) $level->qty - (float) $level->reserved_qty);
         });
     }
 
@@ -155,6 +162,8 @@ class StockService
                 'reserved_qty' => max(0, round((float) $level->reserved_qty - $quantity, 3)),
             ]);
 
+            $this->dispatchStockLevel($product, $warehouse, (float) $level->qty - (float) $level->reserved_qty);
+
             return StockMovement::query()->create([
                 'product_id' => $product->getKey(),
                 'warehouse_id' => $warehouse->getKey(),
@@ -168,6 +177,15 @@ class StockService
                 'occurred_at' => now(),
             ]);
         });
+    }
+
+    private function dispatchStockLevel(Product $product, Warehouse $warehouse, float $available): void
+    {
+        StockLevelUpdated::dispatch(
+            productId: (int) $product->getKey(),
+            warehouseId: (int) $warehouse->getKey(),
+            available: $available,
+        );
     }
 
     public function stockFor(Product $product, Warehouse $warehouse): float

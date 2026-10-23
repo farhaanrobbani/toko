@@ -18,11 +18,15 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\OrderTrackingController;
 use App\Http\Controllers\PosController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\StockAvailabilityController;
 use App\Http\Controllers\StorefrontController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [StorefrontController::class, 'index'])->name('home');
 Route::get('/produk/{product:slug}', [StorefrontController::class, 'show'])->name('store.products.show');
+Route::get('/stok', StockAvailabilityController::class)
+    ->middleware('throttle:120,1')
+    ->name('stock.live');
 
 Route::get('/keranjang', [CartController::class, 'index'])->name('cart.index');
 Route::post('/keranjang/{product}', [CartController::class, 'store'])->name('cart.store');

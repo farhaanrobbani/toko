@@ -25,14 +25,17 @@
             @endif
         </div>
 
-        <div>
+        <div x-data="productStock({{ $product->getKey() }}, {{ (float) $available }}, @js($product->unit))">
             <p class="text-sm font-semibold uppercase tracking-widest text-indigo-600">{{ $product->category?->name ?? 'Produk' }}</p>
             <h1 class="mt-2 text-3xl font-bold tracking-tight text-gray-900">{{ $product->name }}</h1>
             <p class="mt-1 text-sm text-gray-500">SKU {{ $product->sku }} · Satuan {{ $product->unit }}</p>
 
             <p class="mt-5 text-3xl font-bold text-gray-900">{{ rupiah($product->sell_price) }}</p>
-            <p class="mt-1 text-sm {{ $available > 0 ? 'text-green-600' : 'text-red-500' }}">
-                {{ $available > 0 ? 'Stok tersedia '.qty($available).' '.$product->unit : 'Stok habis' }}
+            <p
+                class="mt-1 text-sm"
+                :class="available > 0.0005 ? 'text-green-600' : 'text-red-500'"
+            >
+                <span x-text="stockText">{{ $available > 0 ? 'Stok tersedia '.qty($available).' '.$product->unit : 'Stok habis' }}</span>
             </p>
 
             @if ($product->description)
@@ -40,18 +43,20 @@
             @endif
 
             <div class="mt-6 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-                @if ($available > 0)
+                <template x-if="available > 0.0005">
                     <form method="POST" action="{{ route('cart.store', $product) }}" class="flex flex-wrap items-end gap-3">
                         @csrf
                         <div>
                             <x-input-label for="quantity" value="Jumlah ({{ $product->unit }})" class="text-xs" />
-                            <input id="quantity" name="quantity" type="number" step="0.001" min="0.001" max="{{ $available }}" value="{{ old('quantity', 1) }}" class="mt-1 w-32 rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                            <input id="quantity" name="quantity" type="number" step="0.001" min="0.001" :max="available" value="{{ old('quantity', 1) }}" class="mt-1 w-32 rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
                         </div>
                         <button type="submit" class="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700">Tambah ke Keranjang</button>
                     </form>
-                @else
+                </template>
+
+                <template x-if="available <= 0.0005">
                     <p class="text-sm font-medium text-red-600">Produk ini sedang tidak tersedia.</p>
-                @endif
+                </template>
 
                 @if ($wa)
                     <a href="https://wa.me/{{ $wa }}?text={{ $waText }}" target="_blank" rel="noopener" class="mt-4 inline-block text-sm font-medium text-gray-600 hover:text-indigo-600">Tanya produk via WhatsApp &rarr;</a>
