@@ -2,12 +2,16 @@
 
 namespace Database\Seeders;
 
+use App\Enums\StockMovementType;
 use App\Enums\UserRole;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Setting;
+use App\Models\StockMovement;
+use App\Models\Supplier;
 use App\Models\User;
 use App\Models\Warehouse;
+use App\Services\StockService;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -32,9 +36,14 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Gudang', 'is_default' => true, 'is_active' => true],
         );
 
-        Warehouse::query()->firstOrCreate(
+        $store = Warehouse::query()->firstOrCreate(
             ['code' => 'toko'],
             ['name' => 'Toko', 'is_default' => false, 'is_active' => true],
+        );
+
+        Supplier::query()->firstOrCreate(
+            ['name' => 'PT Sumber Makmur'],
+            ['phone' => '081200000001', 'address' => 'Jl. Raya No. 1', 'notes' => 'Supplier demo'],
         );
 
         $categories = collect([
@@ -57,20 +66,38 @@ class DatabaseSeeder extends Seeder
             ['sku' => 'PLK-001', 'barcode' => '8990000000080', 'name' => 'Sabun Mandi 85 g', 'category' => 'Perlengkapan', 'unit' => 'pcs', 'cost' => 3500, 'sell' => 5500, 'min' => 12],
         ];
 
-        foreach ($products as $product) {
-            Product::query()->firstOrCreate(
-                ['sku' => $product['sku']],
+        $stockService = app(StockService::class);
+
+        foreach ($products as $data) {
+            $product = Product::query()->firstOrCreate(
+                ['sku' => $data['sku']],
                 [
-                    'barcode' => $product['barcode'],
-                    'name' => $product['name'],
-                    'category_id' => $categories[$product['category']]->id,
-                    'unit' => $product['unit'],
-                    'cost_price' => $product['cost'],
-                    'sell_price' => $product['sell'],
-                    'min_stock' => $product['min'],
+                    'barcode' => $data['barcode'],
+                    'name' => $data['name'],
+                    'category_id' => $categories[$data['category']]->id,
+                    'unit' => $data['unit'],
+                    'cost_price' => $data['cost'],
+                    'sell_price' => $data['sell'],
+                    'min_stock' => $data['min'],
                     'is_active' => true,
                 ],
             );
+
+            if (StockMovement::query()->where('product_id', $product->getKey())->exists()) {
+                continue;
+            }
+
+            foreach ([[$warehouse, 40], [$store, 8]] as [$location, $quantity]) {
+                $stockService->record(
+                    product: $product,
+                    warehouse: $location,
+                    type: StockMovementType::Adjustment,
+                    quantity: $quantity,
+                    unitCost: (float) $product->cost_price,
+                    note: 'Stok awal demo',
+                    user: $owner,
+                );
+            }
         }
 
         $settings = [
